@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de Talentos — Dr. Miguel Ávila</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body { margin: 0; background: #000000; }
+  * { box-sizing: border-box; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+/* ============================================================
+   34 TEMAS — organizados en 4 dominios (estructura oficial Gallup)
+   ============================================================ */
+const THEMES = {
+  // EJECUCIÓN
+  logrador: { name: "Logrador", domain: "ejecucion", desc: "Necesita lograr algo tangible cada día para sentirse satisfecho. Tiene un fuego interno constante." },
+  disciplina: { name: "Disciplina", domain: "ejecucion", desc: "Crea orden y estructura. Prospera con rutinas, plazos y procesos predecibles." },
+  enfoque: { name: "Enfoque", domain: "ejecucion", desc: "Establece una dirección, la sigue y hace los ajustes necesarios para mantenerse en curso." },
+  responsabilidad: { name: "Responsabilidad", domain: "ejecucion", desc: "Toma posesión psicológica de lo que dice que hará. Comprometido con valores como la honestidad." },
+  restaurador: { name: "Restaurador", domain: "ejecucion", desc: "Excelente para resolver problemas. Sabe diagnosticar y corregir lo que no funciona." },
+  constancia: { name: "Constancia", domain: "ejecucion", desc: "Consciente de la necesidad de tratar a las personas de forma equitativa, con reglas claras para todos." },
+  deliberativo: { name: "Deliberativo", domain: "ejecucion", desc: "Cuidadoso y vigilante. Anticipa obstáculos y toma decisiones con cautela." },
+  convicción: { name: "Convicción", domain: "ejecucion", desc: "Tiene valores fundamentales firmes que dan propósito y dirección a su vida." },
+  arreglista: { name: "Arreglista", domain: "ejecucion", desc: "Adapta los planes según las circunstancias cambiantes, sin perder el rumbo final." },
+  // INFLUENCIA
+  activador: { name: "Activador", domain: "influencia", desc: "Convierte el pensamiento en acción. Impaciente por empezar ya." },
+  mando: { name: "Mando", domain: "influencia", desc: "Toma el control de las situaciones y toma decisiones. Presencia natural de autoridad." },
+  comunicación: { name: "Comunicación", domain: "influencia", desc: "Le gusta explicar, narrar y presentar. Hace que las ideas cobren vida con palabras." },
+  competitividad: { name: "Competitividad", domain: "influencia", desc: "Mide su progreso comparándose con el desempeño de otros. Le gusta ganar." },
+  maximizador: { name: "Maximizador", domain: "influencia", desc: "Se enfoca en fortalezas como vía hacia la excelencia, no en corregir debilidades." },
+  autoconfianza: { name: "Autoconfianza", domain: "influencia", desc: "Tiene certeza interna sobre sus capacidades y juicio. Toma riesgos calculados." },
+  significación: { name: "Significación", domain: "influencia", desc: "Quiere ser visto como significativo. Busca reconocimiento e independencia." },
+  carisma: { name: "Carisma", domain: "influencia", desc: "Le encanta el reto de conocer gente nueva y ganarse su simpatía." },
+  // RELACIONES
+  adaptabilidad: { name: "Adaptabilidad", domain: "relaciones", desc: "Vive en el presente, descubriendo el futuro día a día." },
+  conexión: { name: "Conexión", domain: "relaciones", desc: "Cree que todo sucede por una razón. Ve vínculos entre personas y eventos." },
+  desarrollador: { name: "Desarrollador", domain: "relaciones", desc: "Reconoce y cultiva el potencial en otros. Encuentra satisfacción en su crecimiento." },
+  empatía: { name: "Empatía", domain: "relaciones", desc: "Siente las emociones de quienes le rodean, casi como si fueran propias." },
+  armonía: { name: "Armonía", domain: "relaciones", desc: "Busca consenso. Prefiere encontrar terreno común antes que generar conflicto." },
+  integrador: { name: "Integrador", domain: "relaciones", desc: "Acepta a otros. Busca que cada persona se sienta parte del grupo." },
+  individualización: { name: "Individualización", domain: "relaciones", desc: "Intrigado por las cualidades únicas de cada persona que conoce." },
+  positivo: { name: "Positivo", domain: "relaciones", desc: "Generoso con elogios, sonríe con facilidad y ve el lado positivo de la vida." },
+  relación: { name: "Relación", domain: "relaciones", desc: "Disfruta vínculos cercanos con otros. Encuentra satisfacción profunda en trabajar duro con amigos." },
+  // PENSAMIENTO ESTRATÉGICO
+  analítico: { name: "Analítico", domain: "estrategico", desc: "Busca razones y causas. Capacidad de detectar patrones y relaciones." },
+  contexto: { name: "Contexto", domain: "estrategico", desc: "Disfruta pensar en el pasado para entender el presente con mayor claridad." },
+  futurista: { name: "Futurista", domain: "estrategico", desc: "Inspirado por el futuro y lo que podría llegar a ser. Inspira a otros con su visión." },
+  ideación: { name: "Ideación", domain: "estrategico", desc: "Fascinado por las ideas. Encuentra conexiones entre fenómenos aparentemente dispares." },
+  recopilador: { name: "Recopilador", domain: "estrategico", desc: "Tiene avidez por coleccionar y archivar información, ideas u objetos." },
+  intelección: { name: "Intelección", domain: "estrategico", desc: "Caracterizado por la actividad intelectual. Introspectivo, disfruta pensar a fondo." },
+  aprendizaje: { name: "Aprendizaje", domain: "estrategico", desc: "Le encanta aprender. El proceso de aprender lo emociona tanto como el resultado." },
+  estratégico: { name: "Estratégico", domain: "estrategico", desc: "Crea caminos alternativos para avanzar. Ve patrones donde otros ven complejidad." },
+};
+
+const DOMAINS = {
+  ejecucion: { label: "Ejecución", tagline: "Hacer que las cosas sucedan", color: "#572c80" },
+  influencia: { label: "Influencia", tagline: "Movilizar a otros hacia la acción", color: "#EF9F27" },
+  relaciones: { label: "Construcción de Relaciones", tagline: "Mantener unidos a los equipos", color: "#1D9E75" },
+  estrategico: { label: "Pensamiento Estratégico", tagline: "Analizar, planear, crear ideas", color: "#378ADD" },
+};
+
+/* ============================================================
+   68 PARES — 2 por cada uno de los 34 temas, elección forzada
+   Cada par enfrenta el tema objetivo contra un tema distinto
+   ============================================================ */
+const PAIRS = [
+  ["logrador", "armonía", "Prefiero terminar una tarea hoy mismo", "Prefiero que el equipo esté de acuerdo antes de avanzar"],
+  ["logrador", "contexto", "Necesito sentir que logré algo concreto cada día", "Necesito entender el porqué histórico antes de actuar"],
+  ["disciplina", "ideación", "Funciono mejor con rutinas y horarios claros", "Funciono mejor explorando ideas sin estructura fija"],
+  ["disciplina", "carisma", "Me incomoda el desorden en los procesos", "Me energiza conocer personas nuevas en cualquier momento"],
+  ["enfoque", "adaptabilidad", "Prefiero fijar una meta y no desviarme de ella", "Prefiero adaptarme a lo que el día me traiga"],
+  ["enfoque", "recopilador", "Filtro todo lo que no me acerque a mi objetivo", "Acumulo información aunque no la use de inmediato"],
+  ["responsabilidad", "competitividad", "Lo que más me importa es cumplir lo que prometí", "Lo que más me importa es quedar por encima de otros"],
+  ["responsabilidad", "futurista", "Me enfoco en cumplir compromisos del presente", "Me enfoco en imaginar cómo serán las cosas a futuro"],
+  ["restaurador", "positivo", "Me atrae diagnosticar y resolver lo que está roto", "Me atrae mantener el ánimo alto del equipo"],
+  ["restaurador", "individualización", "Disfruto encontrar la causa raíz de un problema", "Disfruto descubrir qué hace única a cada persona"],
+  ["constancia", "significación", "Creo firmemente en tratar a todos por igual", "Creo firmemente en ser reconocido por mis logros"],
+  ["constancia", "mando", "Las reglas deben aplicar igual para todos, sin excepción", "Tomo el control cuando una situación lo requiere"],
+  ["deliberativo", "activador", "Antes de decidir, pienso en todos los riesgos posibles", "Prefiero actuar ya y ajustar el rumbo después"],
+  ["deliberativo", "comunicación", "Soy cauteloso antes de comprometerme con algo", "Disfruto explicar y presentar ideas frente a otros"],
+  ["convicción", "conexión", "Tengo valores firmes que guían cada decisión que tomo", "Veo conexiones entre eventos que parecen no relacionados"],
+  ["convicción", "analítico", "Actúo desde principios que no estoy dispuesto a negociar", "Necesito datos y pruebas antes de creer algo"],
+  ["arreglista", "estratégico", "Ajusto el plan sobre la marcha según lo que va surgiendo", "Diseño caminos alternativos antes de que surjan obstáculos"],
+  ["arreglista", "desarrollador", "Me adapto rápido cuando las circunstancias cambian", "Disfruto ver crecer el potencial de otra persona"],
+  ["activador", "deliberativo", "Prefiero arrancar un proyecto ya, aunque no esté perfecto", "Prefiero analizar todos los ángulos antes de arrancar"],
+  ["activador", "intelección", "La acción inmediata me da energía", "Pensar a fondo en silencio me da energía"],
+  ["mando", "armonía", "No me incomoda tomar decisiones impopulares si son necesarias", "Prefiero ceder antes que generar un conflicto"],
+  ["mando", "empatía", "Asumo el control cuando nadie más lo hace", "Siento lo que otros sienten, casi como si fuera propio"],
+  ["comunicación", "recopilador", "Disfruto contar historias y captar la atención de otros", "Disfruto reunir y archivar información para usarla después"],
+  ["comunicación", "aprendizaje", "Me gusta transformar ideas complejas en algo fácil de explicar", "Me emociona el proceso mismo de aprender algo nuevo"],
+  ["competitividad", "integrador", "Comparo mi desempeño contra el de otros constantemente", "Busco que cada persona se sienta incluida en el grupo"],
+  ["competitividad", "relación", "Ganar me da una satisfacción difícil de igualar", "Las relaciones profundas y cercanas me dan satisfacción"],
+  ["maximizador", "restaurador", "Prefiero llevar una fortaleza de buena a excelente", "Prefiero arreglar lo que está fallando o roto"],
+  ["maximizador", "constancia", "Me enfoco en lo que ya hago bien para hacerlo excepcional", "Me enfoco en que las reglas se apliquen parejo para todos"],
+  ["autoconfianza", "conexión", "Confío en mi propio juicio incluso sin validación externa", "Creo que las cosas suceden por una razón más grande"],
+  ["autoconfianza", "individualización", "Tomo decisiones basado en mi criterio interno", "Tomo decisiones considerando lo único de cada persona involucrada"],
+  ["significación", "armonía", "Quiero que mi trabajo sea visto e importante", "Quiero que el grupo esté en paz, aunque pase desapercibido"],
+  ["significación", "contexto", "Necesito sentirme reconocido por lo que aporto", "Necesito entender de dónde viene una situación"],
+  ["carisma", "intelección", "Conocer gente nueva es algo que disfruto genuinamente", "Prefiero procesar mis pensamientos a solas, en silencio"],
+  ["carisma", "disciplina", "Inicio conversaciones con extraños con facilidad", "Sigo rutinas y estructuras de forma natural"],
+  ["adaptabilidad", "futurista", "Vivo el presente y respondo según lo que va llegando", "Vivo proyectando cómo será el futuro"],
+  ["adaptabilidad", "estratégico", "Fluyo con lo que el momento exige", "Diseño el camino antes de que el momento llegue"],
+  ["conexión", "logrador", "Veo un propósito o vínculo más grande detrás de los eventos", "Necesito ver resultados concretos para sentirme satisfecho"],
+  ["conexión", "analítico", "Confío en que las cosas tienen un sentido que las conecta", "Confío en los datos más que en las intuiciones"],
+  ["desarrollador", "mando", "Encuentro gran satisfacción en ver crecer a alguien más", "Encuentro gran satisfacción en tomar el control de la situación"],
+  ["desarrollador", "competitividad", "Celebro genuinamente el progreso de otra persona", "Mido mi éxito comparándolo con el de los demás"],
+  ["empatía", "analítico", "Percibo con facilidad lo que otros sienten sin que lo digan", "Necesito evidencia y lógica antes de sacar conclusiones"],
+  ["empatía", "responsabilidad", "Me conecto emocionalmente con lo que otros viven", "Me enfoco en cumplir lo que prometí, más allá de lo emocional"],
+  ["armonía", "ideación", "Prefiero el consenso antes que el debate de ideas", "Disfruto generar ideas nuevas, aunque generen discusión"],
+  ["armonía", "convicción", "Evito el conflicto cuando es posible", "Defiendo mis valores aunque eso genere fricción"],
+  ["integrador", "estratégico", "Me aseguro de que nadie quede fuera del grupo", "Me enfoco en encontrar el mejor camino hacia el resultado"],
+  ["integrador", "logrador", "Priorizo que todos se sientan parte del equipo", "Priorizo terminar la tarea, sin importar quién participe"],
+  ["individualización", "constancia", "Trato a cada persona según lo que la hace única", "Trato a todas las personas exactamente igual, sin excepciones"],
+  ["individualización", "comunicación", "Observo con atención lo que hace diferente a cada quien", "Disfruto comunicar ideas frente a un grupo"],
+  ["positivo", "deliberativo", "Tiendo a ver el lado positivo, incluso en lo difícil", "Tiendo a anticipar riesgos antes de avanzar"],
+  ["positivo", "restaurador", "Elogio con facilidad y genero buen ánimo en otros", "Me enfoco en encontrar y resolver lo que no funciona"],
+  ["relación", "carisma", "Prefiero pocas relaciones, pero muy profundas", "Prefiero conocer a muchas personas distintas"],
+  ["relación", "significación", "El vínculo cercano con pocas personas me da sentido", "Ser reconocido por mi trabajo me da sentido"],
+  ["analítico", "carisma", "Cuestiono todo hasta encontrar pruebas sólidas", "Disfruto el contacto social espontáneo con desconocidos"],
+  ["analítico", "futurista", "Prefiero entender el porqué antes de avanzar", "Prefiero imaginar el qué del futuro antes de avanzar"],
+  ["contexto", "activador", "Entiendo mejor el presente mirando hacia el pasado", "Prefiero actuar ya en lugar de mirar hacia atrás"],
+  ["contexto", "ideación", "Busco entender de dónde viene una idea o situación", "Busco generar ideas nuevas sin mirar atrás"],
+  ["futurista", "deliberativo", "Me inspira imaginar y describir un futuro posible", "Me inspira evaluar con cautela cada riesgo posible"],
+  ["futurista", "disciplina", "Sueño con posibilidades a largo plazo", "Sigo procesos y rutinas establecidas paso a paso"],
+  ["ideación", "constancia", "Conecto ideas que a otros les parecen sin relación", "Aseguro que las reglas se cumplan parejo para todos"],
+  ["ideación", "responsabilidad", "Me fascina explorar conceptos nuevos y poco convencionales", "Me enfoca cumplir cabalmente lo que me comprometí a hacer"],
+  ["recopilador", "mando", "Reúno información, artículos o datos por simple curiosidad", "Tomo el control cuando la situación lo exige"],
+  ["recopilador", "armonía", "Me gusta archivar y guardar información útil", "Me gusta mantener la paz dentro de un grupo"],
+  ["intelección", "carisma", "Disfruto pensar profundamente, casi como ejercicio mental", "Disfruto el contacto social activo y constante"],
+  ["intelección", "activador", "Necesito tiempo a solas para procesar mis ideas", "Necesito pasar a la acción de inmediato"],
+  ["aprendizaje", "logrador", "El proceso de aprender algo nuevo me emociona por sí mismo", "Necesito ver un resultado tangible para sentirme satisfecho"],
+  ["aprendizaje", "significación", "Aprender es una recompensa en sí misma para mí", "Ser reconocido por mis logros es lo que más valoro"],
+  ["estratégico", "empatía", "Veo con claridad el mejor camino entre varias opciones", "Percibo con claridad lo que otros sienten"],
+  ["estratégico", "positivo", "Evalúo distintos escenarios antes de decidir un rumbo", "Mantengo el ánimo del grupo en alto, pase lo que pase"],
+];
+
+/* ============================================================
+   SCORING
+   Cada elección suma 1 punto al tema elegido.
+   Resultado: ranking de 34 temas, Top 5, y distribución por dominio.
+   ============================================================ */
+function computeResults(answers) {
+  const scores = {};
+  Object.keys(THEMES).forEach((k) => (scores[k] = 0));
+  answers.forEach((choice) => {
+    if (choice) scores[choice] = (scores[choice] || 0) + 1;
+  });
+  const ranked = Object.entries(scores)
+    .map(([key, score]) => ({ key, score, ...THEMES[key] }))
+    .sort((a, b) => b.score - a.score);
+
+  const domainTotals = { ejecucion: 0, influencia: 0, relaciones: 0, estrategico: 0 };
+  ranked.forEach((t) => (domainTotals[t.domain] += t.score));
+  const domainMax = { ejecucion: 0, influencia: 0, relaciones: 0, estrategico: 0 };
+  Object.values(THEMES).forEach((t) => {});
+  // max possible per theme appearances is variable; normalize by count of appearances
+  const appearanceCount = {};
+  Object.keys(THEMES).forEach((k) => (appearanceCount[k] = 0));
+  PAIRS.forEach(([a, b]) => {
+    appearanceCount[a] += 1;
+    appearanceCount[b] += 1;
+  });
+
+  return { ranked, domainTotals, appearanceCount };
+}
+
+/* ============================================================
+   UI COMPONENTS
+   ============================================================ */
+const PURPLE = "#572c80";
+
+function ProgressBar({ current, total }) {
+  const pct = Math.round((current / total) * 100);
+  return (
+    <div style={{ width: "100%", marginBottom: 32 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+        <span style={{ fontSize: 12, color: "#8a8a8a", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+          Pregunta {current} de {total}
+        </span>
+        <span style={{ fontSize: 12, color: PURPLE, fontWeight: 500 }}>{pct}%</span>
+      </div>
+      <div style={{ width: "100%", height: 3, background: "#1a1a1a", borderRadius: 4, overflow: "hidden" }}>
+        <div
+          style={{
+            width: `${pct}%`,
+            height: "100%",
+            background: PURPLE,
+            transition: "width 0.4s ease",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ChoiceCard({ text, onClick, side }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        flex: 1,
+        minHeight: 160,
+        background: hover ? "#0D0514" : "#0a0a0a",
+        border: `1.5px solid ${hover ? PURPLE : "#262626"}`,
+        borderRadius: 14,
+        padding: "28px 24px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        transition: "all 0.2s ease",
+        transform: hover ? "translateY(-2px)" : "none",
+      }}
+    >
+      <span style={{ fontSize: 16, lineHeight: 1.5, color: hover ? "#fff" : "#d4d4d4", fontWeight: 400 }}>
+        {text}
+      </span>
+    </button>
+  );
+}
+
+function IntroScreen({ onStart }) {
+  return (
+    <div style={{ maxWidth: 640, margin: "0 auto", textAlign: "center", padding: "60px 20px" }}>
+      <p style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.12em", color: PURPLE, marginBottom: 16 }}>
+        Talentos Naturales · 34 Temas
+      </p>
+      <h1 style={{ fontSize: 32, fontWeight: 500, color: "#fff", marginBottom: 20, lineHeight: 1.3 }}>
+        Descubre tus 5 talentos dominantes
+      </h1>
+      <p style={{ fontSize: 16, lineHeight: 1.8, color: "#aaa", marginBottom: 36 }}>
+        68 pares de elección forzada, inspirados en la metodología de evaluación de talentos
+        de Gallup. Sin término medio: elige instintivamente la afirmación que más se parece a ti.
+        No hay respuestas correctas — solo patrones naturales de pensar, sentir y actuar.
+      </p>
+      <div style={{ display: "flex", gap: 16, justifyContent: "center", marginBottom: 40, flexWrap: "wrap" }}>
+        {[
+          ["68", "preguntas"],
+          ["34", "temas evaluados"],
+          ["~15", "minutos"],
+        ].map(([num, label]) => (
+          <div key={label} style={{ background: "#0D0514", border: "1px solid #2a1638", borderRadius: 10, padding: "14px 22px" }}>
+            <div style={{ fontSize: 22, fontWeight: 300, color: "#fff" }}>{num}</div>
+            <div style={{ fontSize: 11, color: "#9B7FBF", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
+          </div>
+        ))}
+      </div>
+      <button
+        onClick={onStart}
+        style={{
+          background: PURPLE,
+          color: "#fff",
+          border: "none",
+          padding: "14px 36px",
+          borderRadius: 10,
+          fontSize: 15,
+          fontWeight: 500,
+          cursor: "pointer",
+        }}
+      >
+        Comenzar evaluación →
+      </button>
+    </div>
+  );
+}
+
+function QuestionScreen({ pairIndex, onChoose }) {
+  const [a, b, textA, textB] = PAIRS[pairIndex];
+  return (
+    <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 20px" }}>
+      <ProgressBar current={pairIndex + 1} total={PAIRS.length} />
+      <p style={{ textAlign: "center", fontSize: 13, color: "#666", marginBottom: 28, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        ¿Cuál se parece más a ti?
+      </p>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+        <ChoiceCard text={textA} onClick={() => onChoose(a)} side="a" />
+        <ChoiceCard text={textB} onClick={() => onChoose(b)} side="b" />
+      </div>
+    </div>
+  );
+}
+
+function DomainBar({ domain, total, max }) {
+  const d = DOMAINS[domain];
+  const pct = max > 0 ? Math.round((total / max) * 100) : 0;
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>{d.label}</span>
+        <span style={{ fontSize: 12, color: "#888" }}>{total} pts</span>
+      </div>
+      <div style={{ width: "100%", height: 8, background: "#1a1a1a", borderRadius: 6, overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: d.color, borderRadius: 6 }} />
+      </div>
+      <p style={{ fontSize: 11, color: "#666", marginTop: 4 }}>{d.tagline}</p>
+    </div>
+  );
+}
+
+function ResultsScreen({ results, onRestart }) {
+  const { ranked, domainTotals } = results;
+  const top5 = ranked.slice(0, 5);
+  const maxDomainTotal = Math.max(...Object.values(domainTotals));
+
+  return (
+    <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 20px" }}>
+      <p style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.12em", color: PURPLE, marginBottom: 10, textAlign: "center" }}>
+        Tu perfil de talentos
+      </p>
+      <h1 style={{ fontSize: 28, fontWeight: 500, color: "#fff", marginBottom: 8, textAlign: "center" }}>
+        Tus 5 talentos dominantes
+      </h1>
+      <p style={{ fontSize: 14, color: "#888", textAlign: "center", marginBottom: 40 }}>
+        Basado en tus 68 respuestas de elección forzada
+      </p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 48 }}>
+        {top5.map((theme, i) => (
+          <div
+            key={theme.key}
+            style={{
+              background: "#0D0514",
+              border: `1px solid ${DOMAINS[theme.domain].color}55`,
+              borderRadius: 12,
+              padding: "18px 22px",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 16,
+            }}
+          >
+            <span style={{ fontSize: 22, fontWeight: 300, color: DOMAINS[theme.domain].color, minWidth: 32 }}>
+              {i + 1}
+            </span>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                <span style={{ fontSize: 17, fontWeight: 500, color: "#fff" }}>{theme.name}</span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 500,
+                    color: DOMAINS[theme.domain].color,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    border: `1px solid ${DOMAINS[theme.domain].color}55`,
+                    borderRadius: 20,
+                    padding: "2px 8px",
+                  }}
+                >
+                  {DOMAINS[theme.domain].label}
+                </span>
+              </div>
+              <p style={{ fontSize: 13.5, color: "#aaa", lineHeight: 1.6, margin: 0 }}>{theme.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h2 style={{ fontSize: 18, fontWeight: 500, color: "#fff", marginBottom: 6, borderBottom: "0.5px solid #2a2a2a", paddingBottom: 8 }}>
+        Distribución por dominio
+      </h2>
+      <p style={{ fontSize: 13, color: "#888", marginBottom: 20 }}>
+        Dónde se concentra tu forma natural de aportar valor
+      </p>
+      <div style={{ marginBottom: 40 }}>
+        {Object.entries(domainTotals).map(([domain, total]) => (
+          <DomainBar key={domain} domain={domain} total={total} max={maxDomainTotal} />
+        ))}
+      </div>
+
+      <div
+        style={{
+          border: `1px solid ${PURPLE}`,
+          borderRadius: 12,
+          padding: "24px",
+          textAlign: "center",
+          background: "#0D0514",
+          marginBottom: 20,
+        }}
+      >
+        <h3 style={{ fontSize: 16, fontWeight: 500, color: "#fff", marginBottom: 8 }}>
+          ¿Quieres profundizar en tu perfil completo?
+        </h3>
+        <p style={{ fontSize: 13.5, color: "#b0b0b0", marginBottom: 16 }}>
+          Este resultado es una aproximación orientativa. Para el reporte oficial y certificado de los 34 temas, visita Gallup.com.
+        </p>
+        <button
+          onClick={onRestart}
+          style={{
+            background: "transparent",
+            border: `1px solid ${PURPLE}`,
+            color: "#c9a8f0",
+            padding: "10px 24px",
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: 500,
+            cursor: "pointer",
+          }}
+        >
+          Repetir evaluación
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StrengthsAssessment() {
+  const [stage, setStage] = useState("intro"); // intro | quiz | results
+  const [pairIndex, setPairIndex] = useState(0);
+  const [answers, setAnswers] = useState([]);
+
+  const results = useMemo(() => computeResults(answers), [answers]);
+
+  function handleChoose(themeKey) {
+    const next = [...answers, themeKey];
+    setAnswers(next);
+    if (pairIndex + 1 < PAIRS.length) {
+      setPairIndex(pairIndex + 1);
+    } else {
+      setStage("results");
+    }
+  }
+
+  function handleRestart() {
+    setStage("intro");
+    setPairIndex(0);
+    setAnswers([]);
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#000000", fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" }}>
+      {stage === "intro" && <IntroScreen onStart={() => setStage("quiz")} />}
+      {stage === "quiz" && <QuestionScreen pairIndex={pairIndex} onChoose={handleChoose} />}
+      {stage === "results" && <ResultsScreen results={results} onRestart={handleRestart} />}
+    </div>
+  );
+}
+
+
+ReactDOM.createRoot(document.getElementById('root')).render(<StrengthsAssessment />);
+</script>
+</body>
+</html>
