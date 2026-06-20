@@ -6,7 +6,7 @@
 <title>Test de Talentos — Dr. Miguel Ávila</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
 <style>
   body { margin: 0; background: #000000; }
   * { box-sizing: border-box; }
@@ -15,7 +15,7 @@
 <body>
 <div id="root"></div>
 
-<script type="text/babel">
+<script type="text/plain" id="app-source">
 const { useState, useMemo } = React;
 
 /* ============================================================
@@ -68,6 +68,25 @@ const DOMAINS = {
   relaciones: { label: "Construcción de Relaciones", tagline: "Mantener unidos a los equipos", color: "#1D9E75" },
   estrategico: { label: "Pensamiento Estratégico", tagline: "Analizar, planear, crear ideas", color: "#378ADD" },
 };
+
+const THEME_KEYS_ORDERED = Object.keys(THEMES);
+
+/* Codifica el Top 5 (índices de THEME_KEYS_ORDERED) en un string corto para compartir por URL */
+function encodeResultToHash(top5Keys) {
+  const indices = top5Keys.map((k) => THEME_KEYS_ORDERED.indexOf(k));
+  return indices.map((i) => i.toString(36)).join("-");
+}
+
+function decodeHashToThemes(hash) {
+  try {
+    const indices = hash.split("-").map((s) => parseInt(s, 36));
+    const keys = indices.map((i) => THEME_KEYS_ORDERED[i]).filter(Boolean);
+    if (keys.length === 0) return null;
+    return keys.map((key) => ({ key, score: null, ...THEMES[key] }));
+  } catch (e) {
+    return null;
+  }
+}
 
 /* ============================================================
    68 PARES — 2 por cada uno de los 34 temas, elección forzada
@@ -233,9 +252,21 @@ function ChoiceCard({ text, onClick, side }) {
   );
 }
 
+function Header() {
+  return (
+    <div style={{ position: "absolute", top: 24, left: 24, zIndex: 10 }}>
+      <img
+        src="data:image/png;base64,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"
+        alt="Dr. Miguel Ávila"
+        style={{ height: 44, width: "auto", display: "block" }}
+      />
+    </div>
+  );
+}
+
 function IntroScreen({ onStart }) {
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", textAlign: "center", padding: "60px 20px" }}>
+    <div style={{ maxWidth: 640, margin: "0 auto", textAlign: "center", padding: "120px 20px 60px" }}>
       <p style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.12em", color: PURPLE, marginBottom: 16 }}>
         Talentos Naturales · 34 Temas
       </p>
@@ -281,7 +312,7 @@ function IntroScreen({ onStart }) {
 function QuestionScreen({ pairIndex, onChoose }) {
   const [a, b, textA, textB] = PAIRS[pairIndex];
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 20px" }}>
+    <div style={{ maxWidth: 720, margin: "0 auto", padding: "100px 20px 40px" }}>
       <ProgressBar current={pairIndex + 1} total={PAIRS.length} />
       <p style={{ textAlign: "center", fontSize: 13, color: "#666", marginBottom: 28, textTransform: "uppercase", letterSpacing: "0.05em" }}>
         ¿Cuál se parece más a ti?
@@ -311,13 +342,82 @@ function DomainBar({ domain, total, max }) {
   );
 }
 
-function ResultsScreen({ results, onRestart }) {
-  const { ranked, domainTotals } = results;
-  const top5 = ranked.slice(0, 5);
-  const maxDomainTotal = Math.max(...Object.values(domainTotals));
+function ShareLinkBox({ top5 }) {
+  const [copied, setCopied] = useState(false);
+  const hash = encodeResultToHash(top5.map((t) => t.key));
+  const baseUrl = window.location.origin + window.location.pathname;
+  const shareUrl = `${baseUrl}#r=${hash}`;
+
+  function handleCopy() {
+    const input = document.getElementById("share-link-input");
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(shareUrl).catch(() => {
+      document.execCommand("copy");
+    });
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  }
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 20px" }}>
+    <div style={{ marginBottom: 36 }}>
+      <p style={{ fontSize: 13, fontWeight: 500, color: "#9B7FBF", marginBottom: 8 }}>
+        Enlace para compartir tu resultado
+      </p>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          background: "#0D0514",
+          border: `1px solid ${PURPLE}`,
+          borderRadius: 8,
+          padding: "10px 14px",
+        }}
+      >
+        <input
+          id="share-link-input"
+          type="text"
+          readOnly
+          value={shareUrl}
+          style={{
+            flex: 1,
+            background: "transparent",
+            border: "none",
+            color: "#c9a8f0",
+            fontSize: 13,
+            outline: "none",
+            fontFamily: "monospace",
+          }}
+        />
+        <button
+          onClick={handleCopy}
+          style={{
+            background: PURPLE,
+            color: "#fff",
+            border: "none",
+            padding: "6px 14px",
+            borderRadius: 6,
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {copied ? "¡Copiado!" : "Copiar"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ResultsScreen({ results, isSharedView }) {
+  const { ranked, domainTotals } = results;
+  const top5 = ranked.slice(0, 5);
+  const maxDomainTotal = isSharedView ? 0 : Math.max(...Object.values(domainTotals));
+
+  return (
+    <div style={{ maxWidth: 720, margin: "0 auto", padding: "100px 20px 40px" }}>
       <p style={{ fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.12em", color: PURPLE, marginBottom: 10, textAlign: "center" }}>
         Tu perfil de talentos
       </p>
@@ -325,10 +425,10 @@ function ResultsScreen({ results, onRestart }) {
         Tus 5 talentos dominantes
       </h1>
       <p style={{ fontSize: 14, color: "#888", textAlign: "center", marginBottom: 40 }}>
-        Basado en tus 68 respuestas de elección forzada
+        {isSharedView ? "Resultado compartido" : "Basado en tus 68 respuestas de elección forzada"}
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 48 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36 }}>
         {top5.map((theme, i) => (
           <div
             key={theme.key}
@@ -369,17 +469,23 @@ function ResultsScreen({ results, onRestart }) {
         ))}
       </div>
 
-      <h2 style={{ fontSize: 18, fontWeight: 500, color: "#fff", marginBottom: 6, borderBottom: "0.5px solid #2a2a2a", paddingBottom: 8 }}>
-        Distribución por dominio
-      </h2>
-      <p style={{ fontSize: 13, color: "#888", marginBottom: 20 }}>
-        Dónde se concentra tu forma natural de aportar valor
-      </p>
-      <div style={{ marginBottom: 40 }}>
-        {Object.entries(domainTotals).map(([domain, total]) => (
-          <DomainBar key={domain} domain={domain} total={total} max={maxDomainTotal} />
-        ))}
-      </div>
+      {!isSharedView && <ShareLinkBox top5={top5} />}
+
+      {!isSharedView && (
+        <>
+          <h2 style={{ fontSize: 18, fontWeight: 500, color: "#fff", marginBottom: 6, borderBottom: "0.5px solid #2a2a2a", paddingBottom: 8 }}>
+            Distribución por dominio
+          </h2>
+          <p style={{ fontSize: 13, color: "#888", marginBottom: 20 }}>
+            Dónde se concentra tu forma natural de aportar valor
+          </p>
+          <div style={{ marginBottom: 40 }}>
+            {Object.entries(domainTotals).map(([domain, total]) => (
+              <DomainBar key={domain} domain={domain} total={total} max={maxDomainTotal} />
+            ))}
+          </div>
+        </>
+      )}
 
       <div
         style={{
@@ -397,28 +503,38 @@ function ResultsScreen({ results, onRestart }) {
         <p style={{ fontSize: 13.5, color: "#b0b0b0", marginBottom: 16 }}>
           Este resultado es una aproximación orientativa. Para el reporte oficial y certificado de los 34 temas, visita Gallup.com.
         </p>
-        <button
-          onClick={onRestart}
+        <a
+          href="https://www.drmiguelavila.com"
           style={{
-            background: "transparent",
+            display: "inline-block",
+            background: PURPLE,
             border: `1px solid ${PURPLE}`,
-            color: "#c9a8f0",
+            color: "#fff",
             padding: "10px 24px",
             borderRadius: 8,
             fontSize: 14,
             fontWeight: 500,
             cursor: "pointer",
+            textDecoration: "none",
           }}
         >
-          Repetir evaluación
-        </button>
+          Regresar a drmiguelavila.com
+        </a>
       </div>
     </div>
   );
 }
 
 function StrengthsAssessment() {
-  const [stage, setStage] = useState("intro"); // intro | quiz | results
+  const sharedThemes = useMemo(() => {
+    const hashMatch = window.location.hash.match(/r=([a-z0-9-]+)/i);
+    if (hashMatch) {
+      return decodeHashToThemes(hashMatch[1]);
+    }
+    return null;
+  }, []);
+
+  const [stage, setStage] = useState(sharedThemes ? "shared" : "intro"); // intro | quiz | results | shared
   const [pairIndex, setPairIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
 
@@ -434,23 +550,37 @@ function StrengthsAssessment() {
     }
   }
 
-  function handleRestart() {
-    setStage("intro");
-    setPairIndex(0);
-    setAnswers([]);
-  }
+  const sharedResultsObject = sharedThemes
+    ? { ranked: sharedThemes, domainTotals: { ejecucion: 0, influencia: 0, relaciones: 0, estrategico: 0 } }
+    : null;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#000000", fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#000000", fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif", position: "relative" }}>
+      <Header />
       {stage === "intro" && <IntroScreen onStart={() => setStage("quiz")} />}
       {stage === "quiz" && <QuestionScreen pairIndex={pairIndex} onChoose={handleChoose} />}
-      {stage === "results" && <ResultsScreen results={results} onRestart={handleRestart} />}
+      {stage === "results" && <ResultsScreen results={results} isSharedView={false} />}
+      {stage === "shared" && <ResultsScreen results={sharedResultsObject} isSharedView={true} />}
     </div>
   );
 }
 
 
-ReactDOM.createRoot(document.getElementById('root')).render(<StrengthsAssessment />);
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(StrengthsAssessment));
+</script>
+
+<script>
+  // Transpile with CLASSIC runtime (React.createElement), NOT automatic runtime.
+  // The automatic runtime emits `import { jsx } from "react/jsx-runtime"`,
+  // which crashes silently in a plain <script> tag (not type="module"),
+  // causing a blank black screen with no visible error.
+  var source = document.getElementById('app-source').textContent;
+  var output = Babel.transform(source, {
+    presets: [["react", { runtime: "classic" }]]
+  }).code;
+  var script = document.createElement('script');
+  script.text = output;
+  document.body.appendChild(script);
 </script>
 </body>
 </html>
