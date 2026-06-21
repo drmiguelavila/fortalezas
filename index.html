@@ -23,44 +23,214 @@ const { useState, useMemo } = React;
    34 TEMAS — organizados en 4 dominios (estructura oficial Gallup)
    ============================================================ */
 const THEMES = {
-  // EJECUCIÓN
-  logrador: { name: "Logrador", domain: "ejecucion", desc: "Necesita lograr algo tangible cada día para sentirse satisfecho. Tiene un fuego interno constante." },
-  disciplina: { name: "Disciplina", domain: "ejecucion", desc: "Crea orden y estructura. Prospera con rutinas, plazos y procesos predecibles." },
-  enfoque: { name: "Enfoque", domain: "ejecucion", desc: "Establece una dirección, la sigue y hace los ajustes necesarios para mantenerse en curso." },
-  responsabilidad: { name: "Responsabilidad", domain: "ejecucion", desc: "Toma posesión psicológica de lo que dice que hará. Comprometido con valores como la honestidad." },
-  restaurador: { name: "Restaurador", domain: "ejecucion", desc: "Excelente para resolver problemas. Sabe diagnosticar y corregir lo que no funciona." },
-  constancia: { name: "Constancia", domain: "ejecucion", desc: "Consciente de la necesidad de tratar a las personas de forma equitativa, con reglas claras para todos." },
-  deliberativo: { name: "Deliberativo", domain: "ejecucion", desc: "Cuidadoso y vigilante. Anticipa obstáculos y toma decisiones con cautela." },
-  convicción: { name: "Convicción", domain: "ejecucion", desc: "Tiene valores fundamentales firmes que dan propósito y dirección a su vida." },
-  arreglista: { name: "Arreglista", domain: "ejecucion", desc: "Adapta los planes según las circunstancias cambiantes, sin perder el rumbo final." },
-  // INFLUENCIA
-  activador: { name: "Activador", domain: "influencia", desc: "Convierte el pensamiento en acción. Impaciente por empezar ya." },
-  mando: { name: "Mando", domain: "influencia", desc: "Toma el control de las situaciones y toma decisiones. Presencia natural de autoridad." },
-  comunicación: { name: "Comunicación", domain: "influencia", desc: "Le gusta explicar, narrar y presentar. Hace que las ideas cobren vida con palabras." },
-  competitividad: { name: "Competitividad", domain: "influencia", desc: "Mide su progreso comparándose con el desempeño de otros. Le gusta ganar." },
-  maximizador: { name: "Maximizador", domain: "influencia", desc: "Se enfoca en fortalezas como vía hacia la excelencia, no en corregir debilidades." },
-  autoconfianza: { name: "Autoconfianza", domain: "influencia", desc: "Tiene certeza interna sobre sus capacidades y juicio. Toma riesgos calculados." },
-  significación: { name: "Significación", domain: "influencia", desc: "Quiere ser visto como significativo. Busca reconocimiento e independencia." },
-  carisma: { name: "Carisma", domain: "influencia", desc: "Le encanta el reto de conocer gente nueva y ganarse su simpatía." },
-  // RELACIONES
-  adaptabilidad: { name: "Adaptabilidad", domain: "relaciones", desc: "Vive en el presente, descubriendo el futuro día a día." },
-  conexión: { name: "Conexión", domain: "relaciones", desc: "Cree que todo sucede por una razón. Ve vínculos entre personas y eventos." },
-  desarrollador: { name: "Desarrollador", domain: "relaciones", desc: "Reconoce y cultiva el potencial en otros. Encuentra satisfacción en su crecimiento." },
-  empatía: { name: "Empatía", domain: "relaciones", desc: "Siente las emociones de quienes le rodean, casi como si fueran propias." },
-  armonía: { name: "Armonía", domain: "relaciones", desc: "Busca consenso. Prefiere encontrar terreno común antes que generar conflicto." },
-  integrador: { name: "Integrador", domain: "relaciones", desc: "Acepta a otros. Busca que cada persona se sienta parte del grupo." },
-  individualización: { name: "Individualización", domain: "relaciones", desc: "Intrigado por las cualidades únicas de cada persona que conoce." },
-  positivo: { name: "Positivo", domain: "relaciones", desc: "Generoso con elogios, sonríe con facilidad y ve el lado positivo de la vida." },
-  relación: { name: "Relación", domain: "relaciones", desc: "Disfruta vínculos cercanos con otros. Encuentra satisfacción profunda en trabajar duro con amigos." },
-  // PENSAMIENTO ESTRATÉGICO
-  analítico: { name: "Analítico", domain: "estrategico", desc: "Busca razones y causas. Capacidad de detectar patrones y relaciones." },
-  contexto: { name: "Contexto", domain: "estrategico", desc: "Disfruta pensar en el pasado para entender el presente con mayor claridad." },
-  futurista: { name: "Futurista", domain: "estrategico", desc: "Inspirado por el futuro y lo que podría llegar a ser. Inspira a otros con su visión." },
-  ideación: { name: "Ideación", domain: "estrategico", desc: "Fascinado por las ideas. Encuentra conexiones entre fenómenos aparentemente dispares." },
-  recopilador: { name: "Recopilador", domain: "estrategico", desc: "Tiene avidez por coleccionar y archivar información, ideas u objetos." },
-  intelección: { name: "Intelección", domain: "estrategico", desc: "Caracterizado por la actividad intelectual. Introspectivo, disfruta pensar a fondo." },
-  aprendizaje: { name: "Aprendizaje", domain: "estrategico", desc: "Le encanta aprender. El proceso de aprender lo emociona tanto como el resultado." },
-  estratégico: { name: "Estratégico", domain: "estrategico", desc: "Crea caminos alternativos para avanzar. Ve patrones donde otros ven complejidad." },
+  // ============ EJECUCIÓN ============
+  logrador: {
+    name: "Logrador", domain: "ejecucion",
+    desc: "Necesita lograr algo tangible cada día para sentirse satisfecho. Tiene un fuego interno constante que lo empuja a hacer más.",
+    basement: "Puede caer en el agotamiento por no saber detenerse. Mide su valor por lo que produce, no por quién es, y rara vez celebra lo ya logrado antes de perseguir lo siguiente.",
+    develop: "Define qué significa 'suficiente' para cada día antes de empezar. Programa pausas reales en tu agenda, no solo cuando el cuerpo colapsa. Celebra explícitamente los logros ya alcanzados antes de fijar el siguiente objetivo."
+  },
+  disciplina: {
+    name: "Disciplina", domain: "ejecucion",
+    desc: "Crea orden y estructura. Prospera con rutinas, plazos y procesos predecibles que dan forma a su entorno.",
+    basement: "Puede volverse rígido ante el cambio inesperado y generar fricción con personas que necesitan más flexibilidad o espontaneidad para rendir bien.",
+    develop: "Diseña rutinas con 'márgenes' deliberados de flexibilidad. Practica deliberadamente situaciones sin estructura predefinida para ampliar tu tolerancia a la ambigüedad."
+  },
+  enfoque: {
+    name: "Enfoque", domain: "ejecucion",
+    desc: "Establece una dirección clara, la sigue con disciplina y hace los ajustes necesarios para mantenerse en curso hacia su meta.",
+    basement: "Puede volverse unidimensional, ignorando información relevante o relaciones importantes que no están directamente alineadas con el objetivo actual.",
+    develop: "Revisa periódicamente si tu objetivo sigue siendo el correcto, no solo si avanzas hacia él. Agenda tiempo explícito para temas fuera de tu enfoque principal."
+  },
+  responsabilidad: {
+    name: "Responsabilidad", domain: "ejecucion",
+    desc: "Toma posesión psicológica de lo que dice que hará. Profundamente comprometido con valores como la honestidad y la lealtad.",
+    basement: "Tiende a sobrecargarse asumiendo compromisos que no le corresponden, y le cuesta enormemente decir 'no' o delegar tareas importantes.",
+    develop: "Practica decir 'no' a compromisos que no son tuyos por naturaleza. Antes de aceptar algo nuevo, pregúntate si realmente te corresponde a ti."
+  },
+  restaurador: {
+    name: "Restaurador", domain: "ejecucion",
+    desc: "Excelente para resolver problemas. Sabe diagnosticar con precisión qué no funciona y corregirlo de forma sistemática.",
+    basement: "Puede enfocarse tanto en lo que está roto que pasa por alto lo que ya funciona bien, generando una sensación crónica de insatisfacción en sí mismo y en otros.",
+    develop: "Antes de buscar qué arreglar, nombra en voz alta qué está funcionando bien. Pregúntate si el problema realmente necesita tu intervención inmediata."
+  },
+  constancia: {
+    name: "Constancia", domain: "ejecucion",
+    desc: "Consciente de la necesidad de tratar a las personas de forma equitativa, con reglas y estándares claros para todos.",
+    basement: "La rigidez en la aplicación de reglas puede impedirle reconocer que distintas personas, en distintos momentos, necesitan trato distinto para ser tratadas con justicia real.",
+    develop: "Distingue entre 'igualdad' y 'equidad': a veces tratar justo significa adaptar, no replicar lo mismo para todos. Practica evaluar caso por caso antes de aplicar la regla general."
+  },
+  deliberativo: {
+    name: "Deliberativo", domain: "ejecucion",
+    desc: "Cuidadoso y vigilante. Anticipa obstáculos con precisión y toma decisiones solo después de evaluar los riesgos.",
+    basement: "El exceso de cautela puede convertirse en parálisis por análisis, perdiendo oportunidades por sobreanalizar antes de actuar.",
+    develop: "Establece una fecha límite clara para decidir, incluso con información incompleta. Pregúntate qué es lo peor que podría pasar si actúas ahora con un 80% de certeza."
+  },
+  convicción: {
+    name: "Convicción", domain: "ejecucion",
+    desc: "Tiene valores fundamentales firmes que dan propósito, estabilidad y dirección clara a cada decisión de su vida.",
+    basement: "Puede volverse inflexible o moralista, juzgando con dureza a quienes sostienen valores distintos a los suyos en lugar de simplemente vivir los propios.",
+    develop: "Practica separar 'esto va en contra de mis valores' de 'esto está objetivamente mal'. Escucha activamente perspectivas distintas antes de descartarlas."
+  },
+  arreglista: {
+    name: "Arreglista", domain: "ejecucion",
+    desc: "Adapta los planes con agilidad según las circunstancias cambiantes, sin perder de vista el rumbo final que persigue.",
+    basement: "Puede cambiar de dirección con tanta frecuencia que el equipo pierde la sensación de estabilidad, sin entender hacia dónde se dirige realmente el proyecto.",
+    develop: "Comunica explícitamente cuándo y por qué estás ajustando el plan, no solo el ajuste en sí. Distingue entre adaptación estratégica y reacción impulsiva."
+  },
+  // ============ INFLUENCIA ============
+  activador: {
+    name: "Activador", domain: "influencia",
+    desc: "Convierte el pensamiento en acción de inmediato. Impaciente por empezar ya, genera momentum donde otros solo planean.",
+    basement: "Puede actuar antes de pensar lo suficiente, generando errores evitables o frustrando a quienes necesitan más tiempo de análisis antes de avanzar.",
+    develop: "Antes de actuar, formúlate una pregunta clave: '¿qué no sé todavía que podría cambiar mi decisión?'. Apóyate en alguien con Deliberativo o Analítico antes de lanzarte."
+  },
+  mando: {
+    name: "Mando", domain: "influencia",
+    desc: "Toma el control de las situaciones con naturalidad y firmeza. Posee una presencia que inspira autoridad sin esfuerzo.",
+    basement: "Puede resultar intimidante o avasallante, generando que otros se silencien en lugar de aportar, incluso cuando esa no es la intención.",
+    develop: "Practica hacer preguntas antes de dar instrucciones. Pide explícitamente la opinión de otros antes de tomar la decisión final, y deja espacio real para que respondan."
+  },
+  comunicación: {
+    name: "Comunicación", domain: "influencia",
+    desc: "Le gusta explicar, narrar y presentar. Tiene la capacidad de hacer que las ideas cobren vida a través de las palabras.",
+    basement: "Puede dominar las conversaciones sin darse cuenta, dejando poco espacio para que otros se expresen, o exagerar para hacer la historia más atractiva.",
+    develop: "Practica el silencio activo: haz una pregunta y espera al menos 10 segundos antes de hablar de nuevo. Verifica los datos antes de narrarlos con entusiasmo."
+  },
+  competitividad: {
+    name: "Competitividad", domain: "influencia",
+    desc: "Mide su progreso comparándose con el desempeño de otros. Encuentra una motivación genuina en la posibilidad de ganar.",
+    basement: "Puede convertir colaboraciones en rivalidades innecesarias, o sentirse derrotado en contextos donde simplemente no existe una competencia real.",
+    develop: "Distingue conscientemente entre contextos de competencia real y contextos de colaboración. Redefine 'ganar' en términos de tu propio progreso, no solo en comparación con otros."
+  },
+  maximizador: {
+    name: "Maximizador", domain: "influencia",
+    desc: "Se enfoca en las fortalezas como vía hacia la excelencia, no en corregir debilidades. Busca llevar lo bueno a sobresaliente.",
+    basement: "Puede volverse perfeccionista al punto de nunca sentir que algo está terminado, o ignorar problemas reales por enfocarse solo en lo que ya funciona bien.",
+    develop: "Define de antemano qué nivel de 'excelente' es suficiente para cada tarea específica. No todo necesita ser llevado al máximo posible."
+  },
+  autoconfianza: {
+    name: "Autoconfianza", domain: "influencia",
+    desc: "Tiene una certeza interna sólida sobre sus capacidades y juicio. Toma riesgos calculados sin necesitar validación externa constante.",
+    basement: "Puede parecer arrogante o cerrado a retroalimentación, ignorando información valiosa porque confía demasiado en su propio criterio.",
+    develop: "Busca activamente una segunda opinión antes de decisiones importantes, no porque dudes de ti, sino para enriquecer tu perspectiva. Pregunta '¿qué se me puede estar escapando?'"
+  },
+  significación: {
+    name: "Significación", domain: "influencia",
+    desc: "Quiere ser visto como alguien significativo. Busca reconocimiento genuino e independencia en lo que hace.",
+    basement: "Puede tomar decisiones buscando aprobación o visibilidad en lugar del mejor resultado posible, o sentirse herido cuando el reconocimiento no llega como esperaba.",
+    develop: "Antes de actuar, pregúntate si lo harías igual sin que nadie se enterara. Construye también fuentes internas de validación, no solo externas."
+  },
+  carisma: {
+    name: "Carisma", domain: "influencia",
+    desc: "Le encanta el reto de conocer gente nueva y ganarse su simpatía con autenticidad y facilidad natural.",
+    basement: "Puede priorizar cantidad de conexiones sobre profundidad, dejando relaciones importantes sin el cuidado y la continuidad que merecen.",
+    develop: "Después de conocer a alguien nuevo, agenda un seguimiento concreto. Invierte deliberadamente en profundizar al menos una relación existente por cada una nueva que inicias."
+  },
+  // ============ CONSTRUCCIÓN DE RELACIONES ============
+  adaptabilidad: {
+    name: "Adaptabilidad", domain: "relaciones",
+    desc: "Vive en el presente, descubriendo el futuro día a día. Fluye con naturalidad ante lo que cada momento le exige.",
+    basement: "Puede carecer de dirección a largo plazo, reaccionando constantemente a lo inmediato sin construir hacia ninguna meta sostenida en el tiempo.",
+    develop: "Define 2-3 objetivos de largo plazo no negociables, aunque el camino día a día siga siendo flexible. Revísalos mensualmente para no perderlos de vista."
+  },
+  conexión: {
+    name: "Conexión", domain: "relaciones",
+    desc: "Cree que todo sucede por una razón. Percibe vínculos profundos entre personas, eventos y circunstancias aparentes.",
+    basement: "Puede idealizar conexiones que no son saludables, o sentirse responsable de mantener vínculos o situaciones que en realidad deberían soltarse.",
+    develop: "Pregúntate si una conexión percibida realmente aporta valor o solo te mantiene atado por costumbre. No todo lo que parece destinado merece ser sostenido."
+  },
+  desarrollador: {
+    name: "Desarrollador", domain: "relaciones",
+    desc: "Reconoce y cultiva el potencial en otros con generosidad genuina. Encuentra una satisfacción profunda en ver crecer a las personas.",
+    basement: "Puede invertir tiempo y energía en personas que no están realmente dispuestas a crecer, sintiéndose decepcionado cuando el esfuerzo no rinde fruto.",
+    develop: "Antes de invertir en el desarrollo de alguien, confirma que existe disposición real de su parte. Tu energía es limitada; elige dónde invertirla con intención."
+  },
+  empatía: {
+    name: "Empatía", domain: "relaciones",
+    desc: "Siente las emociones de quienes le rodean, casi como si fueran propias. Tiene una sensibilidad emocional poco común.",
+    basement: "Puede absorber tanto el malestar ajeno que termina agotado emocionalmente, perdiendo claridad sobre dónde terminan los sentimientos de otros y empiezan los suyos.",
+    develop: "Practica nombrar explícitamente de quién es la emoción que sientes: '¿esto es mío o lo estoy absorbiendo?'. Establece límites claros de descanso emocional."
+  },
+  armonía: {
+    name: "Armonía", domain: "relaciones",
+    desc: "Busca consenso de forma natural. Prefiere encontrar terreno común antes que generar conflicto innecesario en el grupo.",
+    basement: "Puede evitar conversaciones difíciles que sí son necesarias, sacrificando la verdad o sus propias necesidades con tal de mantener la paz aparente.",
+    develop: "Identifica qué conflictos estás evitando por incomodidad, no por sabiduría real. Practica decir una verdad incómoda en un contexto seguro y de bajo riesgo primero."
+  },
+  integrador: {
+    name: "Integrador", domain: "relaciones",
+    desc: "Acepta a otros con genuina apertura. Busca activamente que cada persona se sienta parte real del grupo.",
+    basement: "Puede diluir la calidad de las decisiones al intentar incluir a todos por igual, incluso cuando algunas voces deberían pesar más que otras según el contexto.",
+    develop: "Distingue entre incluir a todos en el proceso e incluir a todos en la decisión final. A veces inclusión significa escuchar, no necesariamente otorgar el mismo peso a cada voz."
+  },
+  individualización: {
+    name: "Individualización", domain: "relaciones",
+    desc: "Intrigado genuinamente por las cualidades únicas de cada persona que conoce. Ve a cada individuo como un caso particular.",
+    basement: "Puede dificultarle crear políticas o procesos generales, porque cada caso le parece una excepción que merece trato diferenciado.",
+    develop: "Reconoce cuándo una situación necesita una regla general aplicable a todos, y cuándo realmente amerita un trato individualizado. No todo requiere personalización."
+  },
+  positivo: {
+    name: "Positivo", domain: "relaciones",
+    desc: "Generoso con los elogios, sonríe con facilidad y encuentra de forma natural el lado positivo en casi cualquier situación.",
+    basement: "Puede minimizar problemas reales por mantener el ánimo alto, o resultar poco creíble cuando la situación objetivamente requiere seriedad o preocupación genuina.",
+    develop: "Practica validar lo difícil antes de buscar el lado positivo: reconoce el problema en voz alta primero. No toda situación necesita un giro optimista inmediato."
+  },
+  relación: {
+    name: "Relación", domain: "relaciones",
+    desc: "Disfruta vínculos cercanos y profundos. Encuentra satisfacción genuina en trabajar de cerca con personas que ya conoce y en quienes confía.",
+    basement: "Puede mostrarse reservado o distante con personas nuevas, perdiendo oportunidades de relación o colaboración por preferir solo su círculo cercano.",
+    develop: "Date permiso de invertir tiempo en una relación nueva sin la presión de que sea tan profunda como las que ya tienes. La profundidad llega con el tiempo, no de inmediato."
+  },
+  // ============ PENSAMIENTO ESTRATÉGICO ============
+  analítico: {
+    name: "Analítico", domain: "estrategico",
+    desc: "Busca razones y causas con rigor. Tiene una notable capacidad para detectar patrones y relaciones entre datos.",
+    basement: "Puede paralizarse esperando 'suficientes' datos antes de decidir, o hacer sentir a otros que sus ideas son cuestionadas constantemente sin necesidad real.",
+    develop: "Define de antemano qué cantidad de datos es razonable para cada tipo de decisión. No todas las decisiones requieren el mismo nivel de evidencia."
+  },
+  contexto: {
+    name: "Contexto", domain: "estrategico",
+    desc: "Disfruta genuinamente pensar en el pasado para entender el presente con mayor claridad y profundidad histórica.",
+    basement: "Puede quedarse anclado en cómo se hacían las cosas antes, resistiéndose a soluciones nuevas simplemente porque no tienen precedente conocido.",
+    develop: "Usa el pasado como referencia, no como límite. Pregúntate explícitamente: '¿esto sigue siendo válido hoy, o solo es costumbre?'"
+  },
+  futurista: {
+    name: "Futurista", domain: "estrategico",
+    desc: "Inspirado genuinamente por el futuro y lo que podría llegar a ser. Tiene la capacidad de inspirar a otros con su visión.",
+    basement: "Puede desconectarse de las necesidades urgentes del presente, generando frustración en quienes necesitan resultados concretos hoy, no solo una visión a futuro.",
+    develop: "Por cada visión de futuro que compartas, define un paso concreto y accionable para esta semana. Conecta explícitamente la visión con la acción inmediata."
+  },
+  ideación: {
+    name: "Ideación", domain: "estrategico",
+    desc: "Fascinado genuinamente por las ideas. Encuentra conexiones entre fenómenos que a otros les parecen completamente dispares.",
+    basement: "Puede generar tantas ideas nuevas que ninguna llega a ejecutarse, o frustrar a equipos orientados a la implementación que necesitan cerrar, no abrir más opciones.",
+    develop: "Establece un límite consciente de ideas por sesión y elige solo una para llevar a la acción inmediata. Apóyate en alguien con Enfoque o Disciplina para ejecutar."
+  },
+  recopilador: {
+    name: "Recopilador", domain: "estrategico",
+    desc: "Tiene una avidez genuina por coleccionar y archivar información, ideas u objetos que podrían ser útiles más adelante.",
+    basement: "Puede acumular tanta información que se vuelve difícil de organizar o usar, generando sobrecarga en lugar de claridad real.",
+    develop: "Establece revisiones periódicas de lo que has recopilado y descarta activamente lo que ya no aporta valor. Pregúntate: '¿esto lo voy a usar realmente?'"
+  },
+  intelección: {
+    name: "Intelección", domain: "estrategico",
+    desc: "Caracterizado por una intensa actividad intelectual. Introspectivo por naturaleza, disfruta genuinamente pensar a fondo sobre las cosas.",
+    basement: "Puede aislarse demasiado en su propio mundo interno, posponiendo la acción por seguir reflexionando, o resultar difícil de seguir para quienes prefieren conversaciones más concretas.",
+    develop: "Establece un tiempo límite para la reflexión antes de pasar a la acción. Comparte tus pensamientos en voz alta con otros, no solo contigo mismo."
+  },
+  aprendizaje: {
+    name: "Aprendizaje", domain: "estrategico",
+    desc: "Le encanta aprender genuinamente. El proceso mismo de adquirir conocimiento lo emociona tanto como el resultado final.",
+    basement: "Puede acumular cursos y conocimientos sin aplicarlos nunca, persiguiendo la siguiente novedad de aprendizaje en lugar de profundizar y dominar lo ya aprendido.",
+    develop: "Por cada nuevo tema que empieces a estudiar, comprométete a aplicarlo de forma concreta antes de pasar al siguiente. Pregúntate: '¿esto lo voy a usar o solo lo quiero saber?'"
+  },
+  estratégico: {
+    name: "Estratégico", domain: "estrategico",
+    desc: "Crea caminos alternativos para avanzar con claridad. Tiene la capacidad de ver patrones donde otros solo perciben complejidad.",
+    basement: "Puede impacientarse con quienes no ven el camino con la misma claridad, o avanzar solo sin comunicar suficientemente el razonamiento detrás de sus decisiones.",
+    develop: "Explica el 'por qué' detrás de tu estrategia, no solo el 'qué'. Invita activamente a otros a cuestionar tu razonamiento antes de avanzar."
+  },
 };
 
 const DOMAINS = {
@@ -350,12 +520,41 @@ function generatePDF(top5, domainTotals) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   const PURPLE_RGB = [87, 44, 128];
+  const RED_RGB = [200, 60, 50];
+  const GREEN_RGB = [20, 120, 90];
   const GRAY = [90, 90, 90];
   const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 56;
+  const footerLimit = pageHeight - 60;
+
+  function drawFooter() {
+    const footerY = pageHeight - 40;
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.5);
+    doc.line(margin, footerY - 12, pageWidth - margin, footerY - 12);
+    doc.setTextColor(...PURPLE_RGB);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.text("drmiguelavila.com", margin, footerY);
+    doc.setTextColor(...GRAY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Basado en la investigación de Don Clifton & Gallup · Resultado orientativo, no oficial", margin, footerY + 12);
+  }
+
+  function ensureSpace(neededHeight, y) {
+    if (y + neededHeight > footerLimit) {
+      drawFooter();
+      doc.addPage();
+      return 64;
+    }
+    return y;
+  }
+
   let y = 56;
 
-  // Logo (morado, esquina superior izquierda)
+  // Header con logo (solo primera página)
   try {
     doc.addImage("data:image/png;base64,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", "PNG", margin, y, 42, 50);
   } catch (e) {}
@@ -373,45 +572,89 @@ function generatePDF(top5, domainTotals) {
   doc.setDrawColor(...PURPLE_RGB);
   doc.setLineWidth(1.2);
   doc.line(margin, y, pageWidth - margin, y);
-  y += 30;
+  y += 28;
 
   top5.forEach((theme, i) => {
-    const boxHeight = 64;
+    const contentWidth = pageWidth - margin * 2 - 48;
+    const descLines = doc.splitTextToSize(theme.desc, contentWidth);
+    const basementLines = doc.splitTextToSize(theme.basement, contentWidth - 14);
+    const developLines = doc.splitTextToSize(theme.develop, contentWidth - 14);
+
+    const headerH = 18 + descLines.length * 12;
+    const basementH = 20 + basementLines.length * 11;
+    const developH = 20 + developLines.length * 11;
+    const totalBoxHeight = headerH + basementH + developH + 24;
+
+    y = ensureSpace(totalBoxHeight + 16, y);
+
+    const boxTop = y;
     doc.setFillColor(247, 245, 250);
     doc.setDrawColor(...PURPLE_RGB);
     doc.setLineWidth(0.6);
-    doc.roundedRect(margin, y, pageWidth - margin * 2, boxHeight, 6, 6, "FD");
+    doc.roundedRect(margin, boxTop, pageWidth - margin * 2, totalBoxHeight, 6, 6, "FD");
+
+    let innerY = boxTop + 18;
 
     doc.setTextColor(...PURPLE_RGB);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(20);
-    doc.text(String(i + 1), margin + 16, y + 30);
+    doc.setFontSize(18);
+    doc.text(String(i + 1), margin + 14, innerY);
 
     doc.setTextColor(20, 20, 20);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13.5);
-    doc.text(theme.name, margin + 48, y + 22);
+    doc.text(theme.name, margin + 42, innerY - 4);
 
     doc.setTextColor(...PURPLE_RGB);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
-    doc.text(DOMAINS[theme.domain].label.toUpperCase(), margin + 48, y + 34);
+    doc.setFontSize(8);
+    doc.text(DOMAINS[theme.domain].label.toUpperCase(), margin + 42, innerY + 8);
 
+    innerY += 18;
     doc.setTextColor(...GRAY);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9.5);
-    const descLines = doc.splitTextToSize(theme.desc, pageWidth - margin * 2 - 60);
-    doc.text(descLines.slice(0, 2), margin + 48, y + 48);
+    doc.setFontSize(9.3);
+    doc.text(descLines, margin + 42, innerY);
+    innerY += descLines.length * 12 + 10;
 
-    y += boxHeight + 12;
+    // Sótano
+    const basementBoxH = basementLines.length * 11 + 18;
+    doc.setFillColor(252, 235, 233);
+    doc.roundedRect(margin + 14, innerY - 12, pageWidth - margin * 2 - 28, basementBoxH, 4, 4, "F");
+    doc.setTextColor(...RED_RGB);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.3);
+    doc.text("SÓTANO — RIESGO DE SOBREUSO", margin + 22, innerY);
+    doc.setTextColor(120, 50, 45);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(basementLines, margin + 22, innerY + 12);
+    innerY += basementBoxH + 8;
+
+    // Desarrollo
+    const developBoxH = developLines.length * 11 + 18;
+    doc.setFillColor(228, 245, 238);
+    doc.roundedRect(margin + 14, innerY - 12, pageWidth - margin * 2 - 28, developBoxH, 4, 4, "F");
+    doc.setTextColor(...GREEN_RGB);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.3);
+    doc.text("CÓMO FORTALECERLO", margin + 22, innerY);
+    doc.setTextColor(30, 90, 65);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(developLines, margin + 22, innerY + 12);
+
+    y = boxTop + totalBoxHeight + 16;
   });
 
-  y += 10;
+  // Distribución por dominio
+  y = ensureSpace(180, y);
+  y += 6;
   doc.setTextColor(...PURPLE_RGB);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
+  doc.setFontSize(13);
   doc.text("Distribución por dominio", margin, y);
-  y += 18;
+  y += 22;
 
   Object.entries(domainTotals).forEach(([domain, total]) => {
     const d = DOMAINS[domain];
@@ -430,20 +673,7 @@ function generatePDF(top5, domainTotals) {
     y += 32;
   });
 
-  // Footer
-  const footerY = doc.internal.pageSize.getHeight() - 40;
-  doc.setDrawColor(220, 220, 220);
-  doc.setLineWidth(0.5);
-  doc.line(margin, footerY - 12, pageWidth - margin, footerY - 12);
-  doc.setTextColor(...PURPLE_RGB);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9.5);
-  doc.text("drmiguelavila.com", margin, footerY);
-  doc.setTextColor(...GRAY);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.text("Basado en la investigación de Don Clifton & Gallup · Resultado orientativo, no oficial", margin, footerY + 12);
-
+  drawFooter();
   doc.save("talentos-dominantes.pdf");
 }
 
@@ -585,7 +815,7 @@ function ResultsScreen({ results, isSharedView }) {
         {isSharedView ? "Resultado compartido" : "Basado en tus 68 respuestas de elección forzada"}
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 36 }}>
         {top5.map((theme, i) => (
           <div
             key={theme.key}
@@ -593,34 +823,48 @@ function ResultsScreen({ results, isSharedView }) {
               background: "#0D0514",
               border: `1px solid ${DOMAINS[theme.domain].color}55`,
               borderRadius: 12,
-              padding: "18px 22px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 16,
+              padding: "20px 22px",
             }}
           >
-            <span style={{ fontSize: 22, fontWeight: 300, color: DOMAINS[theme.domain].color, minWidth: 32 }}>
-              {i + 1}
-            </span>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                <span style={{ fontSize: 17, fontWeight: 500, color: "#fff" }}>{theme.name}</span>
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 500,
-                    color: DOMAINS[theme.domain].color,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    border: `1px solid ${DOMAINS[theme.domain].color}55`,
-                    borderRadius: 20,
-                    padding: "2px 8px",
-                  }}
-                >
-                  {DOMAINS[theme.domain].label}
-                </span>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 14 }}>
+              <span style={{ fontSize: 22, fontWeight: 300, color: DOMAINS[theme.domain].color, minWidth: 32 }}>
+                {i + 1}
+              </span>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 17, fontWeight: 500, color: "#fff" }}>{theme.name}</span>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 500,
+                      color: DOMAINS[theme.domain].color,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      border: `1px solid ${DOMAINS[theme.domain].color}55`,
+                      borderRadius: 20,
+                      padding: "2px 8px",
+                    }}
+                  >
+                    {DOMAINS[theme.domain].label}
+                  </span>
+                </div>
+                <p style={{ fontSize: 13.5, color: "#aaa", lineHeight: 1.6, margin: 0 }}>{theme.desc}</p>
               </div>
-              <p style={{ fontSize: 13.5, color: "#aaa", lineHeight: 1.6, margin: 0 }}>{theme.desc}</p>
+            </div>
+
+            <div style={{ paddingLeft: 48, display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ background: "#1A0808", border: "1px solid #4a2020", borderRadius: 8, padding: "10px 14px" }}>
+                <p style={{ fontSize: 10.5, fontWeight: 600, color: "#E0473D", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>
+                  ⚠ Sótano — riesgo de sobreuso
+                </p>
+                <p style={{ fontSize: 12.5, color: "#d9a8a4", lineHeight: 1.6, margin: 0 }}>{theme.basement}</p>
+              </div>
+              <div style={{ background: "#04140D", border: "1px solid #1D4d3a", borderRadius: 8, padding: "10px 14px" }}>
+                <p style={{ fontSize: 10.5, fontWeight: 600, color: "#1D9E75", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>
+                  ↑ Cómo fortalecerlo
+                </p>
+                <p style={{ fontSize: 12.5, color: "#9DDFC4", lineHeight: 1.6, margin: 0 }}>{theme.develop}</p>
+              </div>
             </div>
           </div>
         ))}
